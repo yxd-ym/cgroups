@@ -84,7 +84,7 @@ func Load(hierarchy Hierarchy, path Path, opts ...InitOpts) (Cgroup, error) {
 	for _, s := range pathers(subsystems) {
 		p, err := path(s.Name())
 		if err != nil {
-			if  errors.Is(err, os.ErrNotExist) {
+			if errors.Is(err, os.ErrNotExist) {
 				return nil, ErrCgroupDeleted
 			}
 			if err == ErrControllerNotActive {
@@ -505,6 +505,20 @@ func (c *cgroup) MoveTo(destination Cgroup) error {
 			}
 		}
 	}
+	return nil
+}
+
+func (c *cgroup) Chown(uid int, gid int) error {
+	for _, s := range pathers(c.subsystems) {
+		p, err := c.path(s.Name())
+		if err != nil {
+			return err
+		}
+		if err := os.Chown(s.Path(p), uid, gid); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

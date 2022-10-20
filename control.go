@@ -96,4 +96,6 @@ type Cgroup interface {
 	State() State
 	// Subsystems returns all the subsystems in the cgroup
 	Subsystems() []Subsystem
+	// Chown changes the owner of the cgroup
+	Chown(uid int, gid int) error
 }
