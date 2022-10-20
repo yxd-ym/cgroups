@@ -514,7 +514,15 @@ func (c *cgroup) Chown(uid int, gid int) error {
 		if err != nil {
 			return err
 		}
-		if err := os.Chown(s.Path(p), uid, gid); err != nil {
+
+		err = filepath.Walk(s.Path(p),
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				return os.Chown(path, uid, gid)
+			})
+		if err != nil {
 			return err
 		}
 	}
