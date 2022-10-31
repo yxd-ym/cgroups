@@ -228,7 +228,7 @@ func (c *cgroup) Delete() error {
 	}
 	var errs []string
 	for _, s := range c.subsystems {
-		if d, ok := s.(deleter); ok {
+		if d, ok := s.(Deleter); ok {
 			sp, err := c.path(s.Name())
 			if err != nil {
 				return err
@@ -238,7 +238,7 @@ func (c *cgroup) Delete() error {
 			}
 			continue
 		}
-		if p, ok := s.(pather); ok {
+		if p, ok := s.(Pather); ok {
 			sp, err := c.path(s.Name())
 			if err != nil {
 				return err
@@ -277,7 +277,7 @@ func (c *cgroup) Stat(handlers ...ErrorHandler) (*v1.Metrics, error) {
 		errs = make(chan error, len(c.subsystems))
 	)
 	for _, s := range c.subsystems {
-		if ss, ok := s.(stater); ok {
+		if ss, ok := s.(Stater); ok {
 			sp, err := c.path(s.Name())
 			if err != nil {
 				return nil, err
@@ -315,7 +315,7 @@ func (c *cgroup) Update(resources *specs.LinuxResources) error {
 		return c.err
 	}
 	for _, s := range c.subsystems {
-		if u, ok := s.(updater); ok {
+		if u, ok := s.(Updater); ok {
 			sp, err := c.path(s.Name())
 			if err != nil {
 				return err
@@ -359,7 +359,7 @@ func (c *cgroup) processes(subsystem Name, recursive bool, pType procType) ([]Pr
 	if s == nil {
 		return nil, fmt.Errorf("cgroups: %s doesn't exist in %s subsystem", sp, subsystem)
 	}
-	path := s.(pather).Path(sp)
+	path := s.(Pather).Path(sp)
 	var processes []Process
 	err = filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
 		if err != nil {

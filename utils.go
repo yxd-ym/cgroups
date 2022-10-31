@@ -257,8 +257,10 @@ func parseKV(raw string) (string, uint64, error) {
 
 // ParseCgroupFile parses the given cgroup file, typically /proc/self/cgroup
 // or /proc/<pid>/cgroup, into a map of subsystems to cgroup paths, e.g.
-//   "cpu": "/user.slice/user-1000.slice"
-//   "pids": "/user.slice/user-1000.slice"
+//
+//	"cpu": "/user.slice/user-1000.slice"
+//	"pids": "/user.slice/user-1000.slice"
+//
 // etc.
 //
 // The resulting map does not have an element for cgroup v2 unified hierarchy.
@@ -335,10 +337,10 @@ func getCgroupDestination(subsystem string) (string, error) {
 	return "", ErrNoCgroupMountDestination
 }
 
-func pathers(subystems []Subsystem) []pather {
-	var out []pather
+func pathers(subystems []Subsystem) []Pather {
+	var out []Pather
 	for _, s := range subystems {
-		if p, ok := s.(pather); ok {
+		if p, ok := s.(Pather); ok {
 			out = append(out, p)
 		}
 	}
@@ -346,7 +348,7 @@ func pathers(subystems []Subsystem) []pather {
 }
 
 func initializeSubsystem(s Subsystem, path Path, resources *specs.LinuxResources) error {
-	if c, ok := s.(creator); ok {
+	if c, ok := s.(Creator); ok {
 		p, err := path(s.Name())
 		if err != nil {
 			return err
@@ -354,7 +356,7 @@ func initializeSubsystem(s Subsystem, path Path, resources *specs.LinuxResources
 		if err := c.Create(p, resources); err != nil {
 			return err
 		}
-	} else if c, ok := s.(pather); ok {
+	} else if c, ok := s.(Pather); ok {
 		p, err := path(s.Name())
 		if err != nil {
 			return err
